@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citigram - Social Media & Messaging</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Grand+Hotel&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        brand: ['Grand Hotel', 'cursive'],
+                    },
+                    colors: {
+                        citigram: {
+                            purple: '#8b5cf6',
+                            pink: '#ec4899',
+                            rose: '#f43f5e',
+                            green: '#10b981',
+                            blue: '#3b82f6',
+                            darkBg: '#0f1117',
+                            darkCard: '#161922',
+                            darkHover: '#1f2330',
+                            darkBorder: '#2a2e3d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .brand-gradient-text {
+            background: linear-gradient(135deg, #a855f7, #ec4899, #f43f5e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-gradient-bg {
+            background: linear-gradient(135deg, #a855f7, #ec4899, #f43f5e);
+        }
+
+        .heart-animation {
+            animation: heartPop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes heartPop {
+            0% { opacity: 0; transform: scale(0.3) rotate(-10deg); }
+            50% { opacity: 1; transform: scale(1.3) rotate(0deg); }
+            100% { opacity: 0; transform: scale(1) rotate(10deg); }
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-citigram-darkBg text-gray-100 font-sans min-h-screen transition-colors duration-200" id="app-body">
+
+    <div class="flex min-h-screen">
+
+        <!-- Desktop Sidebar Navigation -->
+        <aside class="hidden md:flex flex-col justify-between w-64 h-screen sticky top-0 bg-citigram-darkCard border-r border-citigram-darkBorder p-5 z-40">
+            <div>
+                <!-- Brand Title -->
+                <div class="flex items-center gap-3 px-3 py-4 mb-4 cursor-pointer" onclick="switchTab('feed')">
+                    <i class="fa-solid fa-gem text-3xl text-citigram-pink"></i>
+                    <span class="font-brand text-4xl brand-gradient-text">Citigram</span>
+                </div>
+
+                <!-- Active User Quick Info -->
+                <div class="mb-6 px-3 py-2 bg-citigram-darkHover border border-citigram-darkBorder rounded-xl flex items-center justify-between">
+                    <div class="flex items-center gap-2 overflow-hidden">
+                        <img id="active-user-avatar" src="" class="w-8 h-8 rounded-full object-cover border border-citigram-pink">
+                        <div class="truncate">
+                            <p id="active-user-name" class="text-xs font-bold truncate">Loading...</p>
+                            <p id="active-user-handle" class="text-[10px] text-gray-400 truncate">@loading</p>
+                        </div>
+                    </div>
+                    <button onclick="openModal('userSwitchModal')" class="text-citigram-pink hover:text-white text-xs font-semibold px-2 py-1 bg-citigram-darkCard rounded-lg border border-citigram-darkBorder">
+                        Switch
+                    </button>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="space-y-2">
+                    <button id="nav-feed" onclick="switchTab('feed')" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-citigram-darkHover text-lg font-medium transition text-citigram-pink">
+                        <i class="fa-solid fa-house text-xl w-6"></i> Home
+                    </button>
+                    <button id="nav-circles" onclick="switchTab('circles')" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-citigram-darkHover text-lg font-medium text-gray-400 hover:text-white transition">
+                        <i class="fa-solid fa-users-rays text-xl w-6"></i> Circles
+                    </button>
+                    <button id="nav-messages" onclick="switchTab('messages')" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-citigram-darkHover text-lg font-medium text-gray-400 hover:text-white transition relative">
+                        <i class="fa-solid fa-paper-plane text-xl w-6"></i> Messages
+                        <span id="unread-badge" class="hidden absolute right-4 bg-citigram-pink text-white text-[10px] font-bold px-2 py-0.5 rounded-full">3</span>
+                    </button>
+                    <button id="nav-laugh" onclick="switchTab('laugh')" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-citigram-darkHover text-lg font-medium text-gray-400 hover:text-white transition">
+                        <i class="fa-solid fa-face-laugh-squint text-xl w-6"></i> Laugh
+                    </button>
+                    <button onclick="openModal('createModal')" class="w-full flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-citigram-darkHover text-lg font-medium text-gray-400 hover:text-white transition">
+                        <i class="fa-solid fa-square-plus text-xl w-6"></i> Create Post
+                    </button>
+                    <button onclick="toggleTheme()" class="w-full flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-citigram-darkHover text-lg font-medium text-gray-400 hover:text-white transition">
+                        <i class="fa-solid fa-circle-half-stroke text-xl w-6"></i> Theme
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Profile Account Control -->
+            <div onclick="openModal('userSwitchModal')" class="flex items-center gap-3 px-3 py-3 rounded-xl bg-citigram-darkHover border border-citigram-darkBorder cursor-pointer hover:border-citigram-pink transition">
+                <i class="fa-solid fa-users text-lg text-citigram-pink"></i>
+                <div class="flex flex-col">
+                    <span class="font-semibold text-xs">Switch Account</span>
+                    <span class="text-[10px] text-gray-400">Multi-User System</span>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 max-w-4xl mx-auto p-4 md:p-8 mb-16 md:mb-0">
+
+            <!-- Home Feed Tab -->
+            <section id="tab-feed" class="space-y-6">
+                <!-- Circles Filter Bar -->
+                <div id="circles-filter-container" class="flex items-center gap-3 overflow-x-auto pb-2 no-scrollbar">
+                    <!-- Dynamic Circle Chips Injected -->
+                </div>
+
+                <!-- Stories Bar -->
+                <div class="flex items-center gap-4 p-4 bg-citigram-darkCard border border-citigram-darkBorder rounded-2xl overflow-x-auto no-scrollbar">
+                    <div class="flex flex-col items-center gap-1.5 cursor-pointer min-w-[72px]" onclick="openModal('createModal')">
+                        <div class="relative w-16 h-16 rounded-full p-0.5 brand-gradient-bg">
+                            <img id="story-my-avatar" src="" class="w-full h-full rounded-full object-cover border-2 border-citigram-darkCard" alt="Your story">
+                            <div class="absolute bottom-0 right-0 bg-citigram-pink text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold border-2 border-citigram-darkCard">+</div>
+                        </div>
+                        <span class="text-xs text-gray-300 truncate max-w-[70px]">Your Story</span>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-1.5 cursor-pointer min-w-[72px]">
+                        <div class="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-pink-500 to-rose-500">
+                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150" class="w-full h-full rounded-full object-cover border-2 border-citigram-darkCard">
+                        </div>
+                        <span class="text-xs text-gray-300 truncate max-w-[70px]">mary_w</span>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-1.5 cursor-pointer min-w-[72px]">
+                        <div class="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-emerald-400 to-teal-600">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150" class="w-full h-full rounded-full object-cover border-2 border-citigram-darkCard">
+                        </div>
+                        <span class="text-xs text-gray-300 truncate max-w-[70px]">kamau_dev</span>
+                    </div>
+                </div>
+
+                <!-- Feed Posts Stream -->
+                <div id="posts-container" class="space-y-6"></div>
+            </section>
+
+            <!-- Circles Hub Tab -->
+            <section id="tab-circles" class="hidden space-y-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold flex items-center gap-3">
+                            <i class="fa-solid fa-users-rays text-citigram-pink"></i> Citigram Circles
+                        </h2>
+                        <p class="text-gray-400 text-sm mt-1">Organize your connections into private hubs to share tailored content securely.</p>
+                    </div>
+                    <button onclick="openModal('createCircleModal')" class="brand-gradient-bg px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:opacity-90 transition">
+                        <i class="fa-solid fa-plus"></i> New Circle
+                    </button>
+                </div>
+
+                <div id="circles-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Dynamic Circle Cards Rendered Here -->
+                </div>
+            </section>
+
+            <!-- Direct Messaging Tab -->
+            <section id="tab-messages" class="hidden h-[80vh] flex flex-col md:flex-row bg-citigram-darkCard border border-citigram-darkBorder rounded-2xl overflow-hidden shadow-2xl">
+                <!-- Chat Threads Sidebar -->
+                <div class="w-full md:w-80 border-r border-citigram-darkBorder flex flex-col">
+                    <div class="p-4 border-b border-citigram-darkBorder flex items-center justify-between">
+                        <h2 class="text-lg font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-paper-plane text-citigram-pink"></i> Direct Messages
+                        </h2>
+                        <i class="fa-solid fa-pen-to-square text-gray-400 cursor-pointer hover:text-white"></i>
+                    </div>
+
+                    <!-- Search Input -->
+                    <div class="p-3 border-b border-citigram-darkBorder">
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-gray-400"></i>
+                            <input type="text" placeholder="Search conversations..." class="w-full bg-citigram-darkHover border border-citigram-darkBorder rounded-xl pl-8 pr-3 py-1.5 text-xs text-gray-100 focus:outline-none focus:border-citigram-pink">
+                        </div>
+                    </div>
+
+                    <!-- Threads List -->
+                    <div id="chat-threads-list" class="flex-1 overflow-y-auto divide-y divide-citigram-darkBorder/40">
+                        <!-- Dynamic Chat Threads Injected -->
+                    </div>
+                </div>
+
+                <!-- Chat Conversation Area -->
+                <div class="flex-1 flex flex-col bg-citigram-darkBg/60">
+                    <!-- Active Chat Header -->
+                    <div id="chat-header" class="p-4 border-b border-citigram-darkBorder flex items-center justify-between bg-citigram-darkCard">
+                        <div class="flex items-center gap-3">
+                            <div class="relative">
+                                <img id="chat-header-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150" class="w-10 h-10 rounded-full object-cover">
+                                <span class="w-3 h-3 bg-emerald-500 rounded-full border-2 border-citigram-darkCard absolute bottom-0 right-0"></span>
+                            </div>
+                            <div>
+                                <h3 id="chat-header-name" class="font-bold text-sm">Kamau Dev</h3>
+                                <p id="chat-header-status" class="text-xs text-emerald-400">Active now</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 text-gray-400 text-lg">
+                            <i class="fa-solid fa-phone cursor-pointer hover:text-white"></i>
+                            <i class="fa-solid fa-video cursor-pointer hover:text-white"></i>
+                            <i class="fa-solid fa-circle-info cursor-pointer hover:text-white"></i>
+                        </div>
+                    </div>
+
+                    <!-- Chat Messages Feed -->
+                    <div id="chat-messages-container" class="flex-1 p-4 overflow-y-auto space-y-3">
+                        <!-- Dynamic Messages Injected -->
+                    </div>
+
+                    <!-- Chat Input Box -->
+                    <div class="p-4 border-t border-citigram-darkBorder bg-citigram-darkCard flex items-center gap-3">
+                        <button onclick="triggerPhotoUploadInChat()" class="text-gray-400 hover:text-citigram-pink text-lg">
+                            <i class="fa-regular fa-image"></i>
+                        </button>
+                        <input id="chat-message-input" type="text" class="flex-1 bg-citigram-darkHover border border-citigram-darkBorder rounded-xl px-4 py-2.5 text-xs text-gray-100 focus:outline-none focus:border-citigram-pink" placeholder="Message..." onkeypress="handleChatKeyPress(event)">
+                        <button onclick="sendChatMessage()" class="brand-gradient-bg text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:opacity-90 transition flex items-center gap-1">
+                            <span>Send</span>
+                            <i class="fa-solid fa-paper-plane text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Laugh Video Stream Tab -->
+            <section id="tab-laugh" class="hidden flex flex-col items-center justify-center space-y-4">
+                <div class="relative w-full max-w-sm h-[650px] bg-black rounded-3xl overflow-hidden border border-citigram-darkBorder shadow-2xl flex flex-col justify-between p-6">
+                    <!-- Video Placeholder Image -->
+                    <img id="laugh-media" src="https://images.unsplash.com/photo-1518173946687-a4c8a383392e?w=800" class="absolute inset-0 w-full h-full object-cover" alt="Laugh Clip">
+
+                    <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80"></div>
+
+                    <div class="relative z-10 flex items-center justify-between text-white">
+                        <span class="font-brand text-2xl brand-gradient-text">Laugh</span>
+                        <i class="fa-solid fa-camera text-xl cursor-pointer"></i>
+                    </div>
+
+                    <div class="relative z-10 flex items-end justify-between">
+                        <div class="space-y-2 max-w-[240px]">
+                            <div class="flex items-center gap-2">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100" class="w-9 h-9 rounded-full border border-white object-cover" alt="Creator">
+                                <span class="font-semibold text-sm text-white">@kamau_dev</span>
+                            </div>
+                            <p class="text-xs text-gray-200 line-clamp-2">When your code finally compiles on the first try in Nyeri! 😂🔥 #Laugh #Citigram</p>
+                        </div>
+
+                        <div class="flex flex-col items-center space-y-5 text-white">
+                            <button onclick="toggleLaughLike(this)" class="flex flex-col items-center gap-1 group">
+                                <div class="w-11 h-11 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-xl group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-heart text-white group-[.active]:text-red-500"></i>
+                                </div>
+                                <span class="text-xs font-semibold">14.2K</span>
+                            </button>
+                            <button class="flex flex-col items-center gap-1">
+                                <div class="w-11 h-11 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-xl">
+                                    <i class="fa-solid fa-comment"></i>
+                                </div>
+                                <span class="text-xs font-semibold">512</span>
+                            </button>
+                            <button class="flex flex-col items-center gap-1">
+                                <div class="w-11 h-11 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-xl">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                </div>
+                                <span class="text-xs font-semibold">Share</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Mobile Navigation Toolbar -->
+        <nav class="md:hidden fixed bottom-0 left-0 w-full bg-citigram-darkCard border-t border-citigram-darkBorder flex items-center justify-around py-3 z-50">
+            <button onclick="switchTab('feed')" class="mobile-nav-btn flex flex-col items-center gap-1 text-citigram-pink">
+                <i class="fa-solid fa-house text-lg"></i>
+                <span class="text-[10px]">Home</span>
+            </button>
+            <button onclick="switchTab('circles')" class="mobile-nav-btn flex flex-col items-center gap-1 text-gray-400">
+                <i class="fa-solid fa-users-rays text-lg"></i>
+                <span class="text-[10px]">Circles</span>
+            </button>
+            <button onclick="switchTab('messages')" class="mobile-nav-btn flex flex-col items-center gap-1 text-gray-400 relative">
+                <i class="fa-solid fa-paper-plane text-lg"></i>
+                <span class="text-[10px]">Messages</span>
+            </button>
+            <button onclick="openModal('createModal')" class="mobile-nav-btn flex flex-col items-center gap-1 text-gray-400">
+                <i class="fa-solid fa-square-plus text-xl text-citigram-pink"></i>
+                <span class="text-[10px]">Create</span>
+            </button>
+            <button onclick="switchTab('laugh')" class="mobile-nav-btn flex flex-col items-center gap-1 text-gray-400">
+                <i class="fa-solid fa-face-laugh-squint text-lg"></i>
+                <span class="text-[10px]">Laugh</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- Modals Hub -->
+    <div id="userSwitchModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-citigram-darkCard border border-citigram-darkBorder rounded-2xl w-full max-w-md p-6 space-y-4 relative">
+            <div class="flex items-center justify-between border-b border-citigram-darkBorder pb-3">
+                <h3 class="font-bold text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-users text-citigram-pink"></i> Active Profile Switcher
+                </h3>
+                <button onclick="closeModal('userSwitchModal')" class="text-gray-400 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div id="user-profiles-list" class="space-y-3 max-h-60 overflow-y-auto pr-1"></div>
+
+            <div class="border-t border-citigram-darkBorder pt-3 space-y-3">
+                <p class="text-xs text-gray-400 font-bold uppercase">Add New Account Profile</p>
+                <input id="new-user-name" type="text" class="w-full bg-citigram-darkHover border border-citigram-darkBorder rounded-xl p-2.5 text-xs text-gray-100 focus:outline-none focus:border-citigram-pink" placeholder="Display Name (e.g. Sarah K)">
+                <input id="new-user-handle" type="text" class="w-full bg-citigram-darkHover border border-citigram-darkBorder rounded-xl p-2.5 text-xs text-gray-100 focus:outline-none focus:border-citigram-pink" placeholder="Handle without @ (e.g. sarah_k)">
+                <input id="new-user-avatar" type="text" class="w-full bg-citigram-darkHover border border-citigram-darkBorder rounded-xl p-2.5 text-xs text-gray-100 focus:outline-none focus:border-citigram-pink" placeholder="Avatar Image URL (Optional)">
+                <button onclick="createNewAccount()" class="w-full brand-gradient-bg text-white text-xs font-bold py-2.5 rounded-xl hover:opacity-95 transition">Register New Account</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Post Modal -->
+    <div id="createModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-citigram-darkCard border border-citigram-darkBorder rounded-2xl w-full max-w-md p-6 space-y-4 relative">
+            <div class="flex items-center justify-between border-b border-citigram-darkBorder pb-3">
+                <h3 class="font-bold text-lg">Create New Post</h3>
+                <button onclick="closeModal('createModal')" class="text-gray-400 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-gray-400 font-semibold block mb-1">Caption</label>
+                    <textarea id="create-caption" rows="3" class="w-full bg-citigram-darkHover border border-citigram-darkBorder rounded-xl p-3 text-sm text-gray-100 focus:outline-none focus:border-citigram-pink" placeholder="What's happening?"></textarea>
+                </div>
+
+                <div>
+                    <label class="text-xs text-gray-400 font-semibold block mb-1">Target Circle Privacy Scope</label>
+                    <select id="create-circle" class="w-full bg-citigram-darkHover border border-citigram-darkBorder rounded-xl p-3 text-sm text-gray-100 focus:outline-none focus:border-citigram-pink">
+                    </select>
+                </div>
+
+                <div>
+                    <label class="text-xs text-gray-400 font-semibold block mb-1">Image URL</label>
+                    <input id="create-image" type="text" class="w-full bg-citigram-darkHover border border-citigram-darkBorder rounded-xl p-3 text-sm text-gray-100 focus:outline-none focus:border-citigram-pink" placeholder="https://images.unsplash.com/...">
+                </div>
+
+                <button onclick="submitNewPost()" class="w-full brand-gradient-bg text-white font-bold py-3 rounded-xl hover:opacity-95 transition">Publish to Citigram</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Web Audio API Audio Synthesizer
+        function playAudioTone(freq = 520, type = 'sine', duration = 0.1) {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
+        }
+
+        // Seed Users
+        const defaultUsers = [
+            { id: "u1", handle: "mary_w", name: "Mary W", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150" },
+            { id: "u2", handle: "kamau_dev", name: "Kamau Dev", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150" },
+            { id: "u3", handle: "alex_tech", name: "Alex Tech", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150" }
+        ];
+
+        // Seed Circles
+        const defaultCircles = [
+            { id: "public", name: "Public Feed", desc: "Visible to everyone on Citigram", color: "purple" },
+            { id: "inner", name: "Inner Circle", desc: "Exclusive space for close friends and personal moments", color: "pink", members: ["u1", "u3"] },
+            { id: "nyeri", name: "Nyeri Locals", desc: "Local updates and community feed in Nyeri, Kenya", color: "green", members: ["u1", "u2"] }
+        ];
+
+        // Seed Messages Threads
+        const defaultThreads = [
+            {
+                id: "t1",
+                participantId: "u2",
+                messages: [
+                    { senderId: "u2", text: "Hey! Did you check out the new Circles update on Citigram?", time: "10:14 AM" },
+                    { senderId: "u1", text: "Yes! The privacy scopes are working smoothly.", time: "10:16 AM" }
+                ]
+            },
+            {
+                id: "t2",
+                participantId: "u3",
+                messages: [
+                    { senderId: "u3", text: "Are we meeting up for the Nyeri developer hangout tonight?", time: "09:30 AM" }
+                ]
+            }
+        ];
+
+        // Seed Posts
+        const defaultPosts = [
+            {
+                id: 1,
+                userId: "u1",
+                media: "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=800",
+                caption: "Exploring the picturesque landscapes around Mt. Kenya in Nyeri! 🏔️✨",
+                circle: "nyeri",
+                likedBy: ["u2"],
+                comments: [{ userId: "u2", text: "Nyeri is looking spectacular today!" }],
+                time: "2 hours ago"
+            },
+            {
+                id: 2,
+                userId: "u3",
+                media: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800",
+                caption: "Late night coding session with the squad. Private preview shared exclusively with my Inner Circle! 💻🚀",
+                circle: "inner",
+                likedBy: ["u1"],
+                comments: [{ userId: "u1", text: "Keep crushing it!" }],
+                time: "4 hours ago"
+            }
+        ];
+
+        // Helpers
+        function loadState(key, fallback) {
+            const data = localStorage.getItem(`citigram_${key}`);
+            return data ? JSON.parse(data) : fallback;
+        }
+
+        function saveState(key, data) {
+            localStorage.setItem(`citigram_${key}`, JSON.stringify(data));
+        }
+
+        let users = loadState('users', defaultUsers);
+        let circles = loadState('circles', defaultCircles);
+        let posts = loadState('posts', defaultPosts);
+        let threads = loadState('threads', defaultThreads);
+        let activeUserId = loadState('activeUserId', "u1");
+        let activeThreadId = "t1";
+        let activeCircleFilter = 'all';
+
+        function getActiveUser() {
+            return users.find(u => u.id === activeUserId) || users[0];
+        }
+
+        function syncActiveUserUI() {
+            const activeUser = getActiveUser();
+            document.getElementById('active-user-avatar').src = activeUser.avatar;
+            document.getElementById('story-my-avatar').src = activeUser.avatar;
+            document.getElementById('active-user-name').innerText = activeUser.name;
+            document.getElementById('active-user-handle').innerText = `@${activeUser.handle}`;
+
+            // Render Account Switcher Modal List
+            const listContainer = document.getElementById('user-profiles-list');
+            listContainer.innerHTML = users.map(u => `
+                <div onclick="switchUserAccount('${u.id}')" class="flex items-center justify-between p-2.5 rounded-xl border ${u.id === activeUserId ? 'border-citigram-pink bg-citigram-darkHover' : 'border-citigram-darkBorder bg-citigram-darkCard'} cursor-pointer hover:border-citigram-pink transition">
+                    <div class="flex items-center gap-3">
+                        <img src="${u.avatar}" class="w-9 h-9 rounded-full object-cover">
+                        <div>
+                            <p class="text-xs font-bold">${u.name}</p>
+                            <p class="text-[10px] text-gray-400">@${u.handle}</p>
+                        </div>
+                    </div>
+                    ${u.id === activeUserId ? '<i class="fa-solid fa-circle-check text-citigram-pink text-sm"></i>' : ''}
+                </div>
+            `).join('');
+
+            renderCircleFilters();
+            renderPosts();
+            renderChatThreads();
+            renderChatMessages();
+        }
+
+        function switchUserAccount(userId) {
+            activeUserId = userId;
+            saveState('activeUserId', activeUserId);
+            playAudioTone(640, 'sine', 0.15);
+            closeModal('userSwitchModal');
+            syncActiveUserUI();
+        }
+
+        // Messaging Engine Functions
+        function renderChatThreads() {
+            const container = document.getElementById('chat-threads-list');
+            container.innerHTML = threads.map(t => {
+                const partner = users.find(u => u.id === t.participantId) || { name: "User", avatar: "", handle: "user" };
+                const lastMsg = t.messages[t.messages.length - 1] || { text: "No messages yet", time: "" };
+                const isActive = t.id === activeThreadId;
+
+                return `
+                    <div onclick="selectChatThread('${t.id}')" class="p-3.5 flex items-center gap-3 cursor-pointer hover:bg-citigram-darkHover transition ${isActive ? 'bg-citigram-darkHover border-l-4 border-citigram-pink' : ''}">
+                        <div class="relative">
+                            <img src="${partner.avatar}" class="w-11 h-11 rounded-full object-cover">
+                            <span class="w-3 h-3 bg-emerald-500 rounded-full border-2 border-citigram-darkCard absolute bottom-0 right-0"></span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <h4 class="font-bold text-xs truncate">${partner.name}</h4>
+                                <span class="text-[10px] text-gray-400">${lastMsg.time}</span>
+                            </div>
+                            <p class="text-xs text-gray-400 truncate mt-0.5">${lastMsg.text}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectChatThread(threadId) {
+            activeThreadId = threadId;
+            renderChatThreads();
+            renderChatMessages();
+        }
+
+        function renderChatMessages() {
+            const thread = threads.find(t => t.id === activeThreadId);
+            if(!thread) return;
+
+            const partner = users.find(u => u.id === thread.participantId) || { name: "User", avatar: "" };
+            document.getElementById('chat-header-avatar').src = partner.avatar;
+            document.getElementById('chat-header-name').innerText = partner.name;
+
+            const messagesContainer = document.getElementById('chat-messages-container');
+            messagesContainer.innerHTML = thread.messages.map(m => {
+                const isMe = m.senderId === activeUserId;
+                return `
+                    <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
+                        <div class="max-w-[75%] ${isMe ? 'brand-gradient-bg text-white rounded-2xl rounded-br-none' : 'bg-citigram-darkHover text-gray-100 border border-citigram-darkBorder rounded-2xl rounded-bl-none'} p-3 text-xs shadow-md">
+                            ${m.image ? `<img src="${m.image}" class="rounded-xl mb-2 max-h-48 w-full object-cover">` : ''}
+                            <p>${m.text}</p>
+                        </div>
+                        <span class="text-[9px] text-gray-500 mt-1 px-1">${m.time}</span>
+                    </div>
+                `;
+            }).join('');
+
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chat-message-input');
+            const text = input.value.trim();
+            if(!text) return;
+
+            const thread = threads.find(t => t.id === activeThreadId);
+            if(thread) {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                thread.messages.push({ senderId: activeUserId, text, time: timeStr });
+                saveState('threads', threads);
+                input.value = '';
+                playAudioTone(750, 'sine', 0.1);
+                renderChatThreads();
+                renderChatMessages();
+            }
+        }
+
+        function handleChatKeyPress(e) {
+            if(e.key === 'Enter') sendChatMessage();
+        }
+
+        function triggerPhotoUploadInChat() {
+            const imgUrl = prompt("Enter Image URL to send in chat:");
+            if(imgUrl) {
+                const thread = threads.find(t => t.id === activeThreadId);
+                if(thread) {
+                    const now = new Date();
+                    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    thread.messages.push({ senderId: activeUserId, text: "Shared an image", image: imgUrl, time: timeStr });
+                    saveState('threads', threads);
+                    renderChatThreads();
+                    renderChatMessages();
+                }
+            }
+        }
+
+        function renderCircleFilters() {
+            const activeUser = getActiveUser();
+            const filterContainer = document.getElementById('circles-filter-container');
+            const targetSelect = document.getElementById('create-circle');
+
+            let allowedCircles = circles.filter(c => c.id === 'public' || (c.members && c.members.includes(activeUser.id)));
+
+            filterContainer.innerHTML = `
+                <button onclick="setFilter('all', this)" class="circle-filter-pill ${activeCircleFilter === 'all' ? 'border-citigram-pink bg-citigram-darkHover' : 'border-citigram-darkBorder bg-citigram-darkCard'} px-4 py-2 rounded-full border text-sm font-semibold flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-globe text-citigram-pink"></i> All Feeds
+                </button>
+            ` + allowedCircles.map(c => `
+                <button onclick="setFilter('${c.id}', this)" class="circle-filter-pill ${activeCircleFilter === c.id ? 'border-citigram-pink bg-citigram-darkHover' : 'border-citigram-darkBorder bg-citigram-darkCard'} px-4 py-2 rounded-full border text-sm font-medium flex items-center gap-2 whitespace-nowrap">
+                    <span class="w-2.5 h-2.5 rounded-full bg-citigram-${c.color || 'pink'}"></span> ${c.name}
+                </button>
+            `).join('');
+
+            targetSelect.innerHTML = allowedCircles.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        }
+
+        function setFilter(circleId, el) {
+            activeCircleFilter = circleId;
+            renderCircleFilters();
+            renderPosts();
+        }
+
+        function renderPosts() {
+            const container = document.getElementById('posts-container');
+            const activeUser = getActiveUser();
+
+            let visiblePosts = posts.filter(post => {
+                if(post.circle === 'public' || !post.circle) return true;
+                const circleObj = circles.find(c => c.id === post.circle);
+                return circleObj && circleObj.members && circleObj.members.includes(activeUser.id);
+            });
+
+            if(activeCircleFilter !== 'all') {
+                visiblePosts = visiblePosts.filter(p => p.circle === activeCircleFilter);
+            }
+
+            container.innerHTML = visiblePosts.map(post => {
+                const author = users.find(u => u.id === post.userId) || { name: "User", handle: "user", avatar: "" };
+                const circleObj = circles.find(c => c.id === post.circle);
+                const isLiked = post.likedBy && post.likedBy.includes(activeUser.id);
+
+                return `
+                    <article class="bg-citigram-darkCard border border-citigram-darkBorder rounded-2xl overflow-hidden space-y-3">
+                        <div class="flex items-center justify-between p-4">
+                            <div class="flex items-center gap-3">
+                                <img src="${author.avatar}" class="w-10 h-10 rounded-full object-cover">
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-sm">${author.name}</span>
+                                        ${circleObj ? `<span class="text-[10px] px-2 py-0.5 rounded-full bg-citigram-${circleObj.color || 'pink'}/20 text-citigram-${circleObj.color || 'pink'} border border-citigram-${circleObj.color || 'pink'}/30 font-semibold">${circleObj.name}</span>` : ''}
+                                    </div>
+                                    <span class="text-xs text-gray-400">@${author.handle} • ${post.time}</span>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-ellipsis text-gray-400 cursor-pointer"></i>
+                        </div>
+
+                        <div class="relative bg-black flex items-center justify-center min-h-[300px] max-h-[500px] overflow-hidden group cursor-pointer" ondblclick="doubleTapLikePost(${post.id}, this)">
+                            <img src="${post.media}" class="w-full h-full object-cover">
+                            <i class="fa-solid fa-heart text-6xl text-white drop-shadow-lg absolute opacity-0 pointer-events-none heart-icon-${post.id}"></i>
+                        </div>
+
+                        <div class="p-4 pt-1 space-y-2">
+                            <div class="flex items-center justify-between text-xl pt-1">
+                                <div class="flex items-center gap-4">
+                                    <i onclick="toggleLikePost(${post.id})" class="fa-${isLiked ? 'solid text-red-500' : 'regular text-gray-200'} fa-heart cursor-pointer hover:scale-110 transition"></i>
+                                    <i class="fa-regular fa-comment text-gray-200 cursor-pointer hover:scale-110 transition"></i>
+                                    <i class="fa-regular fa-paper-plane text-gray-200 cursor-pointer hover:scale-110 transition"></i>
+                                </div>
+                                <i class="fa-regular fa-bookmark text-gray-200 cursor-pointer hover:scale-110 transition"></i>
+                            </div>
+
+                            <div class="font-semibold text-sm">${post.likedBy ? post.likedBy.length : 0} likes</div>
+
+                            <div class="text-sm">
+                                <span class="font-bold mr-2">${author.name}</span>
+                                <span class="text-gray-300">${post.caption}</span>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        function switchTab(tab) {
+            document.getElementById('tab-feed').classList.add('hidden');
+            document.getElementById('tab-circles').classList.add('hidden');
+            document.getElementById('tab-messages').classList.add('hidden');
+            document.getElementById('tab-laugh').classList.add('hidden');
+
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('text-citigram-pink'));
+            const activeBtn = document.getElementById(`nav-${tab}`);
+            if(activeBtn) activeBtn.classList.add('text-citigram-pink');
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function toggleTheme() { document.documentElement.classList.toggle('dark'); }
+
+        // Initialize UI Engine
+        syncActiveUserUI();
+    </script>
+</body>
+</html>
