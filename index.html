@@ -715,6 +715,40 @@
 
         // Initialize UI Engine
         syncActiveUserUI();
-    </script>
+   // --- JSONBin Backend Integration ---
+const JSONBIN_BIN_ID = "6ab7d5a0ffd5d1605331a8b3";
+const JSONBIN_MASTER_KEY = "$2a$10$KnoBbGccXiQKZHCyHXYLoOl48Iy2qg5rCrdpxe6s3vFWoT6ngXJU.";
+const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+
+// Helper function to fetch full database state
+async function fetchDatabase() {
+  try {
+    const res = await fetch(`${JSONBIN_URL}/latest`, {
+      headers: { "X-Master-Key": JSONBIN_MASTER_KEY }
+    });
+    const data = await res.json();
+    return data.record || { users: [], posts: [], messages: [], notifications: [] };
+  } catch (err) {
+    console.error("Failed to load database from JSONBin:", err);
+    return { users: [], posts: [], messages: [], notifications: [] };
+  }
+}
+
+// Helper function to update full database state
+async function saveDatabase(data) {
+  try {
+    const res = await fetch(JSONBIN_URL, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Master-Key": JSONBIN_MASTER_KEY
+      },
+      body: JSON.stringify(data)
+    });
+    return await res.json();
+  } catch (err) {
+    console.error("Failed to save database to JSONBin:", err);
+  }
+} </script>
 </body>
 </html>
